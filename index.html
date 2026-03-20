@@ -414,6 +414,8 @@
       const el = document.querySelector(`[data-id="${id}"]`);
       if (el) el.classList.add('checked');
     });
+    if (data.dagFoto) showPhoto('dag', data.dagFoto);
+    if (data.aftenFoto) showPhoto('aften', data.aftenFoto);
     checkDone('dag');
     checkDone('aften');
   }
@@ -444,11 +446,22 @@
     if (!file) return;
     const reader = new FileReader();
     reader.onload = e => {
-      document.getElementById(`${vagt}-img`).src = e.target.result;
-      document.getElementById(`${vagt}-preview`).classList.add('visible');
-      document.getElementById(`${vagt}-remove`).classList.add('visible');
+      showPhoto(vagt, e.target.result);
+      savePhoto(vagt, e.target.result);
     };
     reader.readAsDataURL(file);
+  }
+
+  function showPhoto(vagt, src) {
+    document.getElementById(`${vagt}-img`).src = src;
+    document.getElementById(`${vagt}-preview`).classList.add('visible');
+    document.getElementById(`${vagt}-remove`).classList.add('visible');
+  }
+
+  function savePhoto(vagt, src) {
+    const data = JSON.parse(localStorage.getItem(KEY) || '{}');
+    data[`${vagt}Foto`] = src;
+    localStorage.setItem(KEY, JSON.stringify(data));
   }
 
   function removePhoto(vagt) {
@@ -456,6 +469,9 @@
     document.getElementById(`${vagt}-preview`).classList.remove('visible');
     document.getElementById(`${vagt}-remove`).classList.remove('visible');
     document.getElementById(`${vagt}-foto-input`).value = '';
+    const data = JSON.parse(localStorage.getItem(KEY) || '{}');
+    delete data[`${vagt}Foto`];
+    localStorage.setItem(KEY, JSON.stringify(data));
   }
 
   function resetAll() {
